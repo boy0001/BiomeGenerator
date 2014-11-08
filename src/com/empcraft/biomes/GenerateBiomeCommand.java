@@ -51,8 +51,6 @@ public class GenerateBiomeCommand extends SubCommand {
 
         final World world = player.getWorld();
 
-        world.getBiome(int a, int b)
-        
         int height = 64;
         final PlotWorld plotworld = PlotMain.getWorldSettings(world);
         if (plotworld instanceof DefaultPlotWorld) {

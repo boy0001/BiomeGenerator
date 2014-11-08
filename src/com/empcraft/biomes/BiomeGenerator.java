@@ -292,7 +292,7 @@ public class BiomeGenerator {
                     }
                 }
             }
-        }, Main.interval * counter + 5);
+        }, Main.interval * counter + 20);
 
         return true;
     }
