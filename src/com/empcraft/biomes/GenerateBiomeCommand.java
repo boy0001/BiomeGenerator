@@ -1,20 +1,14 @@
 package com.empcraft.biomes;
 
-import java.util.Random;
-
+import com.intellectualcrafters.plot.*;
+import com.intellectualcrafters.plot.commands.SubCommand;
+import com.intellectualcrafters.plot.generator.DefaultPlotWorld;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
-import com.intellectualcrafters.plot.C;
-import com.intellectualcrafters.plot.PlayerFunctions;
-import com.intellectualcrafters.plot.Plot;
-import com.intellectualcrafters.plot.PlotHelper;
-import com.intellectualcrafters.plot.PlotMain;
-import com.intellectualcrafters.plot.PlotWorld;
-import com.intellectualcrafters.plot.commands.SubCommand;
-import com.intellectualcrafters.plot.generator.DefaultPlotWorld;
+import java.util.Random;
 
 public class GenerateBiomeCommand extends SubCommand {
 
@@ -24,7 +18,7 @@ public class GenerateBiomeCommand extends SubCommand {
 
     @Override
     public boolean execute(final Player player, final String... args) {
-        if (args.length == 1) {
+        if (args.length < 1) {
             PlayerFunctions.sendMessage(player, "&7Use: &c/plot generatebiome <biome>");
             return false;
         }
@@ -38,7 +32,18 @@ public class GenerateBiomeCommand extends SubCommand {
             return false;
         }
 
-        Biome biome = Biome.valueOf(args[0].toUpperCase());
+        Biome biome = null;
+
+        if(args[0].equalsIgnoreCase("auto")) {
+            biome = PlotHelper.getPlotBottomLoc(player.getWorld(), plot.id).add(1, 0, 1).getBlock().getBiome();
+        } else {
+            try {
+                biome = Biome.valueOf(new StringComparsion(args[0], Biome.values()).getBestMatch());
+            } catch(Exception e) {
+                biome = null;
+            }
+        }
+
         if (biome == null) {
             biome = Biome.FOREST;
         }
