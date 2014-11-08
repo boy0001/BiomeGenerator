@@ -1,0 +1,7 @@
+name: BiomeGenerator
+main: com.empcraft.biomes.Main
+version: 0.0.4
+description: Change your plot biome
+authors: [Empire92]
+acknowledge: [wide_load]
+softdepend: [PlotSquared, WorldEdit]
