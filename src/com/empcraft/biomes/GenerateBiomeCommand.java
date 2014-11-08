@@ -18,7 +18,7 @@ public class GenerateBiomeCommand extends SubCommand {
 
     @Override
     public boolean execute(final Player player, final String... args) {
-        if (args.length < 1) {
+        if (args.length == 0) {
             PlayerFunctions.sendMessage(player, "&7Use: &c/plot generatebiome <biome>");
             return false;
         }
@@ -55,7 +55,7 @@ public class GenerateBiomeCommand extends SubCommand {
         final BiomeGenerator bu = new BiomeGenerator(biome, new Random(System.nanoTime()).nextLong());
 
         final World world = player.getWorld();
-
+        
         int height = 64;
         final PlotWorld plotworld = PlotMain.getWorldSettings(world);
         if (plotworld instanceof DefaultPlotWorld) {
