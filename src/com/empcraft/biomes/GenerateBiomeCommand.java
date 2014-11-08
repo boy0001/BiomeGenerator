@@ -24,6 +24,10 @@ public class GenerateBiomeCommand extends SubCommand {
 
     @Override
     public boolean execute(final Player player, final String... args) {
+        if (args.length == 1) {
+            PlayerFunctions.sendMessage(player, "&7Use: &c/plot generatebiome <biome>");
+            return false;
+        }
         if (!PlayerFunctions.isInPlot(player)) {
             sendMessage(player, C.NOT_IN_PLOT);
             return false;
