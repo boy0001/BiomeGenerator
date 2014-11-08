@@ -89,7 +89,17 @@ public class WorldEditListener implements Listener {
                             final Location pos1 = new Location(world, min.getX(), 0, min.getZ());
                             final Location pos2 = new Location(world, max.getX(), world.getMaxHeight(), max.getZ());
 
-                            final Biome biome = Biome.valueOf(sb.toUpperCase());
+                            Biome biome;
+
+                            if(sb.equalsIgnoreCase("auto")) {
+                                biome = p.getLocation().getBlock().getBiome();
+                            } else {
+                                try {
+                                    biome = Biome.valueOf(new StringComparsion(sb, Biome.values()).getBestMatch());
+                                } catch(Exception ex) {
+                                    biome = Biome.FOREST;
+                                }
+                            }
 
                             final BiomeSelection s = new BiomeSelection(world, pos1, pos2, height);
                             final BiomeGenerator bu = new BiomeGenerator(biome, seed);
