@@ -25,13 +25,6 @@ public class WorldEditListener implements Listener {
 
     public WorldEditListener() {
         this.we = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-        try {
-            Class.forName("com.sk89q.worldedit.function.mask.Mask");
-
-            // new worldedit
-        } catch (final Exception e) {
-            // old worldedit
-        }
     }
 
     @EventHandler
