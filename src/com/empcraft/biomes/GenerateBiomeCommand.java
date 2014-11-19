@@ -2,7 +2,13 @@ package com.empcraft.biomes;
 
 import com.intellectualcrafters.plot.*;
 import com.intellectualcrafters.plot.commands.SubCommand;
+import com.intellectualcrafters.plot.config.C;
 import com.intellectualcrafters.plot.generator.DefaultPlotWorld;
+import com.intellectualcrafters.plot.object.Plot;
+import com.intellectualcrafters.plot.object.PlotWorld;
+import com.intellectualcrafters.plot.util.PlayerFunctions;
+import com.intellectualcrafters.plot.util.PlotHelper;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -38,14 +44,16 @@ public class GenerateBiomeCommand extends SubCommand {
             biome = PlotHelper.getPlotBottomLoc(player.getWorld(), plot.id).add(1, 0, 1).getBlock().getBiome();
         } else {
             try {
-                biome = Biome.valueOf(new StringComparsion(args[0], Biome.values()).getBestMatch());
+                String match = new StringComparsion(args[0], Biome.values()).getBestMatch();
+                if (!match.equalsIgnoreCase(args[0])) {
+                    PlayerFunctions.sendMessage(player, C.DID_YOU_MEAN, match);
+                    return false;
+                }
+                biome = Biome.valueOf(match);
             } catch(Exception e) {
-                biome = null;
+                PlayerFunctions.sendMessage(player, C.DID_YOU_MEAN, "FOREST");
+                return false;
             }
-        }
-
-        if (biome == null) {
-            biome = Biome.FOREST;
         }
 
         if (!PlotMain.hasPermission(player, "plots.generatebiome." + biome.name())) {

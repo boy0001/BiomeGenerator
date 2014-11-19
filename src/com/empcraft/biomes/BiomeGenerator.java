@@ -242,9 +242,9 @@ public class BiomeGenerator {
                     world.chunkProvider = currentChunkProvider;
                     BlockFalling.instaFall = true;
                     notifyPlayers();
-                    if (player != null) {
+                    if (player != null && player.isOnline()) {
                         if (Main.canSetFast) {
-                            if (Main.canSetFast) {
+                            if (Main.updateLazy) {
                                 int i = 0;
                                 for (final Chunk chunk: cs) {
                                     i++;
@@ -259,9 +259,10 @@ public class BiomeGenerator {
                                             
                                         } 
                                     }, offset + 20);
-
-                                    
                                 }
+                            }
+                            else {
+                                SetBlockFast.update(player);
                             }
                         }
                     }
