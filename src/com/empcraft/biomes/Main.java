@@ -15,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     public static boolean                  canSetFast;
-    public static boolean                  updateLazy;
     public static int                      inset;
     public String                          version;
     public Main                            plugin;
@@ -76,6 +75,7 @@ public class Main extends JavaPlugin {
 
         try {
             new SetBlockFast();
+            new SendChunk();
             Main.canSetFast = true;
         } catch (final Exception e) {
             Main.canSetFast = false;
@@ -90,7 +90,6 @@ public class Main extends JavaPlugin {
         options.put("base-generation-off-world", "");
         options.put("populator-inset", 4);
         options.put("ticks-per-chunk", 1);
-        options.put("lazy-chunk-updates", false);
         for (final Entry<String, Object> node : options.entrySet()) {
             if (!getConfig().contains(node.getKey())) {
                 getConfig().set(node.getKey(), node.getValue());
@@ -100,7 +99,6 @@ public class Main extends JavaPlugin {
         Main.world = getConfig().getString("base-generation-off-world");
         Main.inset = getConfig().getInt("populator-inset");
         Main.interval = getConfig().getInt("ticks-per-chunk");
-        Main.updateLazy = getConfig().getBoolean("lazy-chunk-updates");
     }
 
     private void setupPlotSquared() {

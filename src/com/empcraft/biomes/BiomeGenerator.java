@@ -242,55 +242,13 @@ public class BiomeGenerator {
                     world.chunkProvider = currentChunkProvider;
                     BlockFalling.instaFall = true;
                     notifyPlayers();
-                    if (player != null && player.isOnline()) {
-                        if (Main.canSetFast) {
-                            if (Main.updateLazy) {
-                                int i = 0;
-                                for (final Chunk chunk: cs) {
-                                    i++;
-                                    final long offset = i;
-                                    Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            
-                                            if (player!=null && player.isOnline() && player.getWorld().equals(world)) {
-                                                player.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
-                                            }
-                                            
-                                        } 
-                                    }, offset + 20);
-                                }
-                            }
-                            else {
-                                SetBlockFast.update(player);
-                            }
-                        }
-                    }
                 } catch (final Throwable e) {
                     final Player player = Bukkit.getPlayer(runner);
                     Main.sendMessage(player, "&aBiome conversion was interrupted!");
                     notifyPlayers();
-                    if (player != null) {
-                        if (Main.canSetFast) {
-                            int i = 0;
-                            for (final Chunk chunk: cs) {
-                                i++;
-                                final long offset = i;
-                                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        
-                                        if (player!=null && player.isOnline() && player.getWorld().equals(world)) {
-                                            player.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
-                                        }
-                                        
-                                    } 
-                                }, offset+20);
-
-                                
-                            }
-                        }
-                    }
+                }
+                if (Main.canSetFast) {
+                    SendChunk.sendChunk(cs);
                 }
             }
         }, Main.interval * counter + 20);
