@@ -1,4 +1,4 @@
 BiomeGenerator
 ==============
 
-EPIC TO THE MAX BIOME GENERATOR. (not really, but sitll somewhat cool)
+EPIC TO THE MAX BIOME GENERATOR. (not really, but still somewhat cool)
