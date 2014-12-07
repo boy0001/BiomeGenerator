@@ -9,10 +9,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements Listener {
 
     public static boolean                  canSetFast;
     public static int                      inset;
@@ -21,7 +24,7 @@ public class Main extends JavaPlugin {
     public static String                   world;
     public static FileConfiguration        config;
     public static HashMap<String, Integer> worldChanged = new HashMap<String, Integer>();
-    public static int interval;
+    public static int                      interval;
 
     private static String colorise(final String mystring) {
         return ChatColor.translateAlternateColorCodes('&', mystring);
@@ -33,7 +36,8 @@ public class Main extends JavaPlugin {
         }
         if (player == null) {
             Bukkit.getServer().getConsoleSender().sendMessage(colorise(mystring));
-        } else {
+        }
+        else {
             player.sendMessage(colorise(mystring));
         }
     }
@@ -44,7 +48,8 @@ public class Main extends JavaPlugin {
                 try {
                     SetBlockFast.set(block.getWorld(), block.getX(), block.getY(), block.getZ(), id, data);
                     return true;
-                } catch (final Throwable e) {
+                }
+                catch (final Throwable e) {
                     canSetFast = false;
                 }
             }
@@ -54,10 +59,12 @@ public class Main extends JavaPlugin {
             if (block.getTypeId() != id) {
                 block.setTypeId(id);
             }
-        } else {
+        }
+        else {
             if (block.getTypeId() == id) {
                 block.setData(data);
-            } else {
+            }
+            else {
                 block.setTypeIdAndData(id, data, false);
             }
         }
@@ -69,6 +76,7 @@ public class Main extends JavaPlugin {
         this.version = getDescription().getVersion();
         this.plugin = this;
         setupPlotSquared();
+        setupPlotMe();
         setupWorldEdit();
         setupConfig();
         Main.config = this.getConfig();
@@ -77,10 +85,12 @@ public class Main extends JavaPlugin {
             new SetBlockFast();
             new SendChunk();
             Main.canSetFast = true;
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             Main.canSetFast = false;
         }
-
+        
+        Bukkit.getServer().getPluginManager().registerEvents(this, this);
     }
 
     private void setupConfig() {
@@ -104,19 +114,35 @@ public class Main extends JavaPlugin {
     private void setupPlotSquared() {
         final Plugin plotsquared = Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
         if ((plotsquared == null) || !plotsquared.isEnabled()) {
-            sendMessage(null, "&c[PlotBiomes] Could not find PlotSquared! Additional features have been disabled");
             return;
         }
+        sendMessage(null, "&8===&3[&7BiomeGenerator hooked into PlotSquared&3]&8===");
         new PlotSquaredFeature();
+    }
+
+    private void setupPlotMe() {
+        final Plugin plotme = Bukkit.getServer().getPluginManager().getPlugin("PlotMe");
+        if ((plotme == null) || !plotme.isEnabled()) {
+            return;
+        }
+        sendMessage(null, "&8===&3[&7BiomeGenerator hooked into PlotMe&3]&8===");
+        Bukkit.getServer().getPluginManager().registerEvents(new PlotMeFeature(), this);
     }
 
     private void setupWorldEdit() {
         final Plugin worldedit = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         if ((worldedit == null) || !worldedit.isEnabled()) {
-            sendMessage(null, "&c[PlotBiomes] Could not find WorldEdit! Additional features have been disabled");
             return;
         }
+        sendMessage(null, "&8===&3[&7BiomeGenerator hooked into WorldEdit&3]&8===");
         final WorldEditListener myclass = new WorldEditListener();
         Bukkit.getServer().getPluginManager().registerEvents(myclass, this);
+    }
+    
+    @EventHandler
+    public void onChunkUnloaded(ChunkUnloadEvent event) {
+        if (BiomeGenerator.running) {
+            event.setCancelled(true);
+        }
     }
 }

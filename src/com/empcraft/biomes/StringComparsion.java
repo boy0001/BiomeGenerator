@@ -1,4 +1,5 @@
 package com.empcraft.biomes;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // PlotSquared - A plot manager and world generator for the Bukkit API /
 // Copyright (c) 2014 IntellectualSites/IntellectualCrafters /
@@ -31,6 +32,7 @@ public class StringComparsion {
     private String bestMatch;
     private double match = 0;
     private Object bestMatchObject;
+
     public StringComparsion(final String input, final Object[] objects) {
         double c = 0;
         for (final Object o : objects) {
@@ -41,15 +43,19 @@ public class StringComparsion {
             }
         }
     }
+
     public Object getMatchObject() {
         return this.bestMatchObject;
     }
+
     public String getBestMatch() {
         return this.bestMatch;
     }
+
     public Object[] getBestMatchAdvanced() {
-        return new Object[]{this.match, this.bestMatch};
+        return new Object[] { this.match, this.bestMatch };
     }
+
     public static double compare(final String s1, final String s2) {
         final ArrayList p1 = wLetterPair(s1.toUpperCase()), p2 = wLetterPair(s2.toUpperCase());
         int intersection = 0;
@@ -65,6 +71,7 @@ public class StringComparsion {
         }
         return (2.0 * intersection) / union;
     }
+
     public static ArrayList wLetterPair(final String s) {
         final ArrayList<String> aPairs = new ArrayList<String>();
         final String[] wo = s.split("\\s");
@@ -74,6 +81,7 @@ public class StringComparsion {
         }
         return aPairs;
     }
+
     public static String[] sLetterPair(final String s) {
         final int numPair = s.length() - 1;
         final String[] p = new String[numPair];

@@ -1,6 +1,13 @@
 package com.empcraft.biomes;
 
-import com.intellectualcrafters.plot.*;
+import java.util.Random;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.entity.Player;
+
+import com.intellectualcrafters.plot.PlotMain;
 import com.intellectualcrafters.plot.commands.SubCommand;
 import com.intellectualcrafters.plot.config.C;
 import com.intellectualcrafters.plot.generator.DefaultPlotWorld;
@@ -8,13 +15,6 @@ import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotWorld;
 import com.intellectualcrafters.plot.util.PlayerFunctions;
 import com.intellectualcrafters.plot.util.PlotHelper;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.entity.Player;
-
-import java.util.Random;
 
 public class GenerateBiomeCommand extends SubCommand {
 
@@ -40,17 +40,19 @@ public class GenerateBiomeCommand extends SubCommand {
 
         Biome biome = null;
 
-        if(args[0].equalsIgnoreCase("auto")) {
+        if (args[0].equalsIgnoreCase("auto")) {
             biome = PlotHelper.getPlotBottomLoc(player.getWorld(), plot.id).add(1, 0, 1).getBlock().getBiome();
-        } else {
+        }
+        else {
             try {
-                String match = new StringComparsion(args[0], Biome.values()).getBestMatch();
+                final String match = new StringComparsion(args[0], Biome.values()).getBestMatch();
                 if (!match.equalsIgnoreCase(args[0])) {
                     PlayerFunctions.sendMessage(player, C.DID_YOU_MEAN, match);
                     return false;
                 }
                 biome = Biome.valueOf(match);
-            } catch(Exception e) {
+            }
+            catch (final Exception e) {
                 PlayerFunctions.sendMessage(player, C.DID_YOU_MEAN, "FOREST");
                 return false;
             }
@@ -58,12 +60,22 @@ public class GenerateBiomeCommand extends SubCommand {
 
         if (!PlotMain.hasPermission(player, "plots.generatebiome." + biome.name())) {
             PlayerFunctions.sendMessage(player, C.NO_PERMISSION, "plots.generatebiome." + biome.name());
+            return false;
+        }
+        
+        if (BiomeGenerator.running) {
+            String name = player.getName();
+            Main.sendMessage(player, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
+            if (BiomeGenerator.runner.equals(name) && !BiomeGenerator.runners.contains(name)) {
+                BiomeGenerator.runners.add(name);
+            }
+            return false;
         }
 
         final BiomeGenerator bu = new BiomeGenerator(biome, new Random(System.nanoTime()).nextLong());
 
         final World world = player.getWorld();
-        
+
         int height = 64;
         final PlotWorld plotworld = PlotMain.getWorldSettings(world);
         if (plotworld instanceof DefaultPlotWorld) {

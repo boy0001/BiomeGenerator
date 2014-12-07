@@ -44,16 +44,17 @@ public class WorldEditListener implements Listener {
                         if (args.length > 2) {
                             try {
                                 height = Integer.parseInt(args[2]);
-                            } catch (final Exception ex2) {
+                            }
+                            catch (final Exception ex2) {
                                 Main.sendMessage(p, "&cInvalid integer height: &a" + args[2] + "\n&6Use &7//biomegen <biome> [height]");
                                 return;
                             }
                         }
-                        
+
                         long seed;
                         if (args.length > 3) {
-                            World world = Bukkit.getWorld(args[3]);
-                            if (world==null) {
+                            final World world = Bukkit.getWorld(args[3]);
+                            if (world == null) {
                                 seed = Long.valueOf(args[3]);
                             }
                             else {
@@ -91,31 +92,46 @@ public class WorldEditListener implements Listener {
 
                             Biome biome;
 
-                            if(sb.equalsIgnoreCase("auto")) {
+                            if (sb.equalsIgnoreCase("auto")) {
                                 biome = p.getLocation().getBlock().getBiome();
-                            } else {
+                            }
+                            else {
                                 try {
                                     biome = Biome.valueOf(new StringComparsion(sb, Biome.values()).getBestMatch());
-                                } catch(Exception ex) {
+                                }
+                                catch (final Exception ex) {
                                     biome = Biome.FOREST;
                                 }
+                            }
+                            
+                            if (BiomeGenerator.running) {
+                                String name = p.getName();
+                                Main.sendMessage(p, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
+                                if (BiomeGenerator.runner.equals(name) && !BiomeGenerator.runners.contains(name)) {
+                                    BiomeGenerator.runners.add(name);
+                                }
+                                return;
                             }
 
                             final BiomeSelection s = new BiomeSelection(world, pos1, pos2, height);
                             final BiomeGenerator bu = new BiomeGenerator(biome, seed);
                             bu.generate(s, p);
-                        } else {
+                        }
+                        else {
                             Main.sendMessage(p, "&cThis command currently only supports cuboid selections");
                             return;
                         }
-                    } catch (final Exception ex) {
+                    }
+                    catch (final Exception ex) {
                         Main.sendMessage(p, "&cInvalid biome &a" + args[1] + "&7. &6Possible options&f: " + StringUtils.join(Biome.values(), ", "));
                     }
-                } else {
+                }
+                else {
                     Main.sendMessage(p, "&cInvalid number of arguments:\n&6Use &7//biomegen <biome> [height]");
                     e.setCancelled(true);
                 }
-            } else {
+            }
+            else {
                 Main.sendMessage(p, "&cYou do not have permission to execute this command.");
             }
             e.setCancelled(true);

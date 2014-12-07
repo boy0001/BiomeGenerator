@@ -29,7 +29,7 @@ public class ReflectionUtils {
 
         /**
          * find constructor by number of arguments
-         * 
+         *
          * @param number
          *            number of arguments
          * @return RefConstructor
@@ -50,7 +50,7 @@ public class ReflectionUtils {
 
         /**
          * find field by type
-         * 
+         *
          * @param type
          *            field type
          * @return RefField
@@ -74,7 +74,7 @@ public class ReflectionUtils {
 
         /**
          * find field by type
-         * 
+         *
          * @param type
          *            field type
          * @return RefField
@@ -87,7 +87,7 @@ public class ReflectionUtils {
 
         /**
          * find method by type parameters
-         * 
+         *
          * @param types
          *            parameters. can be Class or RefClass
          * @return RefMethod object
@@ -100,9 +100,11 @@ public class ReflectionUtils {
             for (final Object e : types) {
                 if (e instanceof Class) {
                     classes[t++] = (Class) e;
-                } else if (e instanceof RefClass) {
+                }
+                else if (e instanceof RefClass) {
                     classes[t++] = ((RefClass) e).getRealClass();
-                } else {
+                }
+                else {
                     classes[t++] = e.getClass();
                 }
             }
@@ -126,7 +128,7 @@ public class ReflectionUtils {
 
         /**
          * find method by name
-         * 
+         *
          * @param names
          *            possible names of method
          * @return RefMethod object
@@ -149,7 +151,7 @@ public class ReflectionUtils {
 
         /**
          * find method by return value
-         * 
+         *
          * @param type
          *            type of returned value
          * @return RefMethod
@@ -173,7 +175,7 @@ public class ReflectionUtils {
 
         /**
          * find method by return value
-         * 
+         *
          * @param type
          *            type of returned value
          * @throws RuntimeException
@@ -186,7 +188,7 @@ public class ReflectionUtils {
 
         /**
          * get existing constructor by types
-         * 
+         *
          * @param types
          *            parameters. can be Class or RefClass
          * @return RefMethod object
@@ -200,25 +202,29 @@ public class ReflectionUtils {
                 for (final Object e : types) {
                     if (e instanceof Class) {
                         classes[i++] = (Class) e;
-                    } else if (e instanceof RefClass) {
+                    }
+                    else if (e instanceof RefClass) {
                         classes[i++] = ((RefClass) e).getRealClass();
-                    } else {
+                    }
+                    else {
                         classes[i++] = e.getClass();
                     }
                 }
                 try {
                     return new RefConstructor(this.clazz.getConstructor(classes));
-                } catch (final NoSuchMethodException ignored) {
+                }
+                catch (final NoSuchMethodException ignored) {
                     return new RefConstructor(this.clazz.getDeclaredConstructor(classes));
                 }
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         /**
          * get field by name
-         * 
+         *
          * @param name
          *            field name
          * @return RefField
@@ -229,17 +235,19 @@ public class ReflectionUtils {
             try {
                 try {
                     return new RefField(this.clazz.getField(name));
-                } catch (final NoSuchFieldException ignored) {
+                }
+                catch (final NoSuchFieldException ignored) {
                     return new RefField(this.clazz.getDeclaredField(name));
                 }
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         /**
          * get existing method by name and types
-         * 
+         *
          * @param name
          *            name
          * @param types
@@ -255,25 +263,29 @@ public class ReflectionUtils {
                 for (final Object e : types) {
                     if (e instanceof Class) {
                         classes[i++] = (Class) e;
-                    } else if (e instanceof RefClass) {
+                    }
+                    else if (e instanceof RefClass) {
                         classes[i++] = ((RefClass) e).getRealClass();
-                    } else {
+                    }
+                    else {
                         classes[i++] = e.getClass();
                     }
                 }
                 try {
                     return new RefMethod(this.clazz.getMethod(name, classes));
-                } catch (final NoSuchMethodException ignored) {
+                }
+                catch (final NoSuchMethodException ignored) {
                     return new RefMethod(this.clazz.getDeclaredMethod(name, classes));
                 }
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         /**
          * get passed class
-         * 
+         *
          * @return class
          */
         public Class<?> getRealClass() {
@@ -282,7 +294,7 @@ public class ReflectionUtils {
 
         /**
          * see {@link Class#isInstance(Object)}
-         * 
+         *
          * @param object
          *            the object to check
          * @return true if object is an instance of this class
@@ -305,7 +317,7 @@ public class ReflectionUtils {
 
         /**
          * create new instance with constructor
-         * 
+         *
          * @param params
          *            parameters for constructor
          * @return new object
@@ -315,7 +327,8 @@ public class ReflectionUtils {
         public Object create(final Object... params) {
             try {
                 return this.constructor.newInstance(params);
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -345,27 +358,29 @@ public class ReflectionUtils {
 
             /**
              * get field value for applied object
-             * 
+             *
              * @return value of field
              */
             public Object get() {
                 try {
                     return RefField.this.field.get(this.e);
-                } catch (final Exception e) {
+                }
+                catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
             /**
              * set field value for applied object
-             * 
+             *
              * @param param
              *            value
              */
             public void set(final Object param) {
                 try {
                     RefField.this.field.set(this.e, param);
-                } catch (final Exception e) {
+                }
+                catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -401,7 +416,7 @@ public class ReflectionUtils {
 
         /**
          * apply fiend for object
-         * 
+         *
          * @param e
          *            applied object
          * @return RefExecutor with getter and setter
@@ -424,7 +439,7 @@ public class ReflectionUtils {
 
             /**
              * apply method for selected object
-             * 
+             *
              * @param params
              *            sent parameters
              * @return return value
@@ -434,7 +449,8 @@ public class ReflectionUtils {
             public Object call(final Object... params) {
                 try {
                     return RefMethod.this.method.invoke(this.e, params);
-                } catch (final Exception e) {
+                }
+                catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -449,7 +465,7 @@ public class ReflectionUtils {
 
         /**
          * call static method
-         * 
+         *
          * @param params
          *            sent parameters
          * @return return value
@@ -457,7 +473,8 @@ public class ReflectionUtils {
         public Object call(final Object... params) {
             try {
                 return this.method.invoke(null, params);
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -485,7 +502,7 @@ public class ReflectionUtils {
 
         /**
          * apply method to object
-         * 
+         *
          * @param e
          *            object to which the method is applied
          * @return RefExecutor with method call(...)
@@ -526,14 +543,15 @@ public class ReflectionUtils {
                     final String verM = pas[3];
                     preClassM += "." + verM;
                 }
-            } catch (final Exception ignored) {
+            }
+            catch (final Exception ignored) {
             }
         }
     }
 
     /**
      * Gets the value of a field from an object.
-     * 
+     *
      * @param src
      *            The class where the field is defined.
      * @param name
@@ -542,7 +560,7 @@ public class ReflectionUtils {
      *            The type of the field.
      * @param from
      *            The object to get the field value from.
-     * 
+     *
      * @return The value of the field.
      * @throws NoSuchFieldException
      *             If the field could not be found
@@ -555,7 +573,8 @@ public class ReflectionUtils {
 
         try {
             return type.cast(field.get(from));
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             e.printStackTrace();
         }
 
@@ -564,7 +583,7 @@ public class ReflectionUtils {
 
     /**
      * get RefClass object by real class
-     * 
+     *
      * @param clazz
      *            class
      * @return RefClass based on passed class
@@ -576,7 +595,7 @@ public class ReflectionUtils {
     /**
      * Get class for name. Replace {nms} to net.minecraft.server.V*. Replace
      * {cb} to org.bukkit.craftbukkit.V*. Replace {nm} to net.minecraft
-     * 
+     *
      * @param classes
      *            possible class paths
      * @return RefClass object
@@ -588,7 +607,8 @@ public class ReflectionUtils {
             try {
                 className = className.replace("{cb}", preClassB).replace("{nms}", preClassM).replace("{nm}", "net.minecraft");
                 return getRefClass(Class.forName(className));
-            } catch (final ClassNotFoundException ignored) {
+            }
+            catch (final ClassNotFoundException ignored) {
             }
         }
         throw new RuntimeException("no class found");
@@ -596,7 +616,7 @@ public class ReflectionUtils {
 
     /**
      * Invokes a method of an object.
-     * 
+     *
      * @param src
      *            The class where the field is defined.
      * @param name
@@ -621,7 +641,8 @@ public class ReflectionUtils {
 
         try {
             return returnType.cast(method.invoke(in, params));
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             e.printStackTrace();
         }
 
@@ -639,7 +660,7 @@ public class ReflectionUtils {
      * Sets the value of a field for an object. Note that this will attempt to
      * override final fields as well, so be careful where it's used. For a
      * static field the <i>in</i> parameter can be null.
-     * 
+     *
      * @param src
      *            The class where the field is defined.
      * @param name
@@ -663,14 +684,16 @@ public class ReflectionUtils {
 
             try {
                 modifiers.set(field, field.getModifiers() & ~Modifier.FINAL);
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 e.printStackTrace();
             }
         }
 
         try {
             field.set(in, value);
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             e.printStackTrace();
         }
     }

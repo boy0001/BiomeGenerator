@@ -38,8 +38,7 @@ public class SetBlockFast {
         methodA = classChunk.getMethod("a", int.class, int.class, int.class, classBlock, int.class);
         methodGetById = classBlock.getMethod("getById", int.class);
     }
-    
-    
+
     public static void update(final org.bukkit.entity.Player player) {
         final int distance = Bukkit.getViewDistance() + 1;
         for (int cx = -distance; cx < distance; cx++) {
