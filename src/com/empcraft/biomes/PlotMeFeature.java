@@ -60,11 +60,11 @@ public class PlotMeFeature implements Listener {
                     return;
                 }
                 
-                if (BiomeGenerator.running) {
+                if (BiomeHandler.isRunning) {
                     String name = player.getName();
                     Main.sendMessage(player, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
-                    if (BiomeGenerator.runner.equals(name) && !BiomeGenerator.runners.contains(name)) {
-                        BiomeGenerator.runners.add(name);
+                    if (BiomeHandler.runner.equals(name) && !BiomeHandler.runners.contains(name)) {
+                        BiomeHandler.runners.add(name);
                     }
                     return;
                 }
@@ -101,15 +101,11 @@ public class PlotMeFeature implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-
-                final BiomeGenerator bu = new BiomeGenerator(biome, new Random(System.nanoTime()).nextLong());
-
+                BiomeHandler.getNewGenerator(biome, new Random(System.nanoTime()).nextLong());
                 final World world = player.getWorld();
-
                 final int height = 64;
-
                 final BiomeSelection selection = new BiomeSelection(world, pos1, pos2, height);
-                bu.generate(selection, player);
+                BiomeHandler.generate(selection, player);
 
                 event.setCancelled(true);
             }

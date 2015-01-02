@@ -1,4 +1,4 @@
-package com.empcraft.biomes;
+package com.empcraft.biomes.generators;
 
 import java.util.List;
 

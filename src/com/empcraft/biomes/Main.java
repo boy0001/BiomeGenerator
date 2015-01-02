@@ -42,6 +42,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean setBlock(final Block block, final short id, final byte data) {
         if (canSetFast) {
             if ((block.getTypeId() != id) || (data != block.getData())) {
@@ -141,7 +142,7 @@ public class Main extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onChunkUnloaded(ChunkUnloadEvent event) {
-        if (BiomeGenerator.running) {
+        if (BiomeHandler.isRunning) {
             event.setCancelled(true);
         }
     }

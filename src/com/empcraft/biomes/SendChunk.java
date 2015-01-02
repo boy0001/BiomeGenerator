@@ -53,6 +53,7 @@ public class SendChunk {
         ChunkCoordIntPairCon = classChunkCoordIntPair.getConstructor(int.class, int.class);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void sendChunk(final ArrayList<Chunk> chunks) {
         int diffx, diffz;
         final int view = Bukkit.getServer().getViewDistance() << 4;

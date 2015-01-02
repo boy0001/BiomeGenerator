@@ -57,7 +57,7 @@ public class StringComparsion {
     }
 
     public static double compare(final String s1, final String s2) {
-        final ArrayList p1 = wLetterPair(s1.toUpperCase()), p2 = wLetterPair(s2.toUpperCase());
+        final ArrayList<String> p1 = wLetterPair(s1.toUpperCase()), p2 = wLetterPair(s2.toUpperCase());
         int intersection = 0;
         final int union = p1.size() + p2.size();
         for (final Object aP1 : p1) {
@@ -72,7 +72,7 @@ public class StringComparsion {
         return (2.0 * intersection) / union;
     }
 
-    public static ArrayList wLetterPair(final String s) {
+    public static ArrayList<String> wLetterPair(final String s) {
         final ArrayList<String> aPairs = new ArrayList<String>();
         final String[] wo = s.split("\\s");
         for (final String aWo : wo) {

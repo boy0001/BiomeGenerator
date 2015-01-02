@@ -104,18 +104,18 @@ public class WorldEditListener implements Listener {
                                 }
                             }
                             
-                            if (BiomeGenerator.running) {
+                            if (BiomeHandler.isRunning) {
                                 String name = p.getName();
                                 Main.sendMessage(p, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
-                                if (BiomeGenerator.runner.equals(name) && !BiomeGenerator.runners.contains(name)) {
-                                    BiomeGenerator.runners.add(name);
+                                if (BiomeHandler.runner.equals(name) && !BiomeHandler.runners.contains(name)) {
+                                    BiomeHandler.runners.add(name);
                                 }
                                 return;
                             }
 
                             final BiomeSelection s = new BiomeSelection(world, pos1, pos2, height);
-                            final BiomeGenerator bu = new BiomeGenerator(biome, seed);
-                            bu.generate(s, p);
+                            BiomeHandler.getNewGenerator(biome, seed);
+                            BiomeHandler.generate(s, p);
                         }
                         else {
                             Main.sendMessage(p, "&cThis command currently only supports cuboid selections");

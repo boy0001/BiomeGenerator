@@ -94,6 +94,7 @@ public class ReflectionUtils {
          * @throws RuntimeException
          *             if method not found
          */
+        @SuppressWarnings("unused")
         public RefMethod findMethod(final Object... types) {
             final Class[] classes = new Class[types.length];
             int t = 0;

@@ -1,4 +1,6 @@
-package com.empcraft.biomes;
+package com.empcraft.biomes.generators;
+
+import com.empcraft.biomes.ReflectionUtils;
 
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.Blocks;
@@ -38,8 +40,7 @@ public class BC extends Chunk {
         try {
             ReflectionUtils.setFieldValue(Chunk.class, "w", this, ReflectionUtils.getFieldValue(Chunk.class, "w", Boolean.class, this.chunk));
             ReflectionUtils.setFieldValue(Chunk.class, "x", this, ReflectionUtils.getFieldValue(Chunk.class, "x", Integer.class, this.chunk));
-        }
-        catch (final NoSuchFieldException e) {
+        } catch (final NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
