@@ -127,7 +127,7 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
         sendMessage(null, "&8===&3[&7BiomeGenerator hooked into PlotMe&3]&8===");
-        Bukkit.getServer().getPluginManager().registerEvents(new PlotMeFeature(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PlotMeFeature(plotme), this);
     }
 
     private void setupWorldEdit() {

@@ -12,13 +12,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.plugin.Plugin;
 
-import com.worldcretornica.plotme.Plot;
-import com.worldcretornica.plotme.PlotManager;
+import com.worldcretornica.plotme_core.Plot;
+import com.worldcretornica.plotme_core.PlotMe_Core;
+import com.worldcretornica.plotme_core.api.IPlotMe_GeneratorManager;
+import com.worldcretornica.plotme_core.bukkit.PlotMe_CorePlugin;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitPlayer;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitWorld;
 
 public class PlotMeFeature implements Listener {
-
+    public PlotMe_Core plotme;
     public static List<String> commands = Arrays.asList(new String[] { "/plot", "/plotme", "/p", "/plotme:plot", "/plotme:p", "/plotme:plotme" });
+
+    
+    
+    public PlotMeFeature(Plugin plotme) {
+        this.plotme = ((PlotMe_CorePlugin) plotme).getAPI();
+    }
 
     @EventHandler
     public void onPlayerCommandPreprocessEvent(final PlayerCommandPreprocessEvent event) {
@@ -38,16 +49,15 @@ public class PlotMeFeature implements Listener {
                     return;
                 }
 
-                final Location loc = player.getLocation();
-                final Plot plotid = PlotManager.getPlotById(loc);
+                final Plot plot = plotme.getPlotMeCoreManager().getPlotById(new BukkitPlayer(player));
 
-                if (plotid == null) {
+                if (plot == null) {
                     Main.sendMessage(player, "&cYou are not in a plot");
                     event.setCancelled(true);
                     return;
                 }
 
-                final UUID owner = PlotManager.getPlotById(loc).getOwnerId();
+                final UUID owner = plot.getOwnerId();
                 if ((owner == null) || !owner.equals(player.getUniqueId())) {
                     Main.sendMessage(player, "&cYou do not own this plot");
                     event.setCancelled(true);
@@ -70,9 +80,13 @@ public class PlotMeFeature implements Listener {
                 }
 
                 Biome biome = null;
-
-                final Location pos1 = new Location(loc.getWorld(), PlotManager.bottomX(plotid.id, player.getWorld()), 64, PlotManager.bottomZ(plotid.id, player.getWorld()));
-                final Location pos2 = new Location(loc.getWorld(), PlotManager.topX(plotid.id, player.getWorld()), 64, PlotManager.topZ(plotid.id, player.getWorld()));
+                final World world = player.getWorld();
+                String worldname = world.getName();
+                String id = plot.getId();
+                BukkitWorld bukkitWorld = new BukkitWorld(player.getWorld());
+                IPlotMe_GeneratorManager genMan = plotme.getGenManager(worldname);
+                Location pos1 = new Location(world, genMan.bottomX(id, bukkitWorld), 256, genMan.bottomZ(id, bukkitWorld));
+                Location pos2 = new Location(world, genMan.topX(id, bukkitWorld), 256, genMan.topZ(id, bukkitWorld));
 
                 if (args[0].equalsIgnoreCase("auto")) {
                     biome = pos1.getBlock().getBiome();
@@ -102,7 +116,6 @@ public class PlotMeFeature implements Listener {
                     return;
                 }
                 BiomeHandler.getNewGenerator(biome, new Random(System.nanoTime()).nextLong());
-                final World world = player.getWorld();
                 final int height = 64;
                 final BiomeSelection selection = new BiomeSelection(world, pos1, pos2, height);
                 BiomeHandler.generate(selection, player);
