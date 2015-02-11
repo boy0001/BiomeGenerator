@@ -1,6 +1,6 @@
 name: BiomeGenerator
 main: com.empcraft.biomes.Main
-version: 0.2
+version: 2.6.3
 description: Change your plot biome
 authors: [Empire92]
 acknowledge: [wide_load]

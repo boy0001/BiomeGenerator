@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.worldcretornica.plotme_core.Plot;
+import com.worldcretornica.plotme_core.PlotMeCoreManager;
 import com.worldcretornica.plotme_core.PlotMe_Core;
 import com.worldcretornica.plotme_core.api.IPlotMe_GeneratorManager;
 import com.worldcretornica.plotme_core.bukkit.PlotMe_CorePlugin;
@@ -49,7 +50,7 @@ public class PlotMeFeature implements Listener {
                     return;
                 }
 
-                final Plot plot = plotme.getPlotMeCoreManager().getPlotById(new BukkitPlayer(player));
+                final Plot plot = PlotMeCoreManager.getInstance().getPlotById(new BukkitPlayer(player));
 
                 if (plot == null) {
                     Main.sendMessage(player, "&cYou are not in a plot");
