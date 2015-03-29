@@ -8,11 +8,12 @@ import org.bukkit.entity.Player;
 
 import com.empcraft.biomes.generators.BiomeGenerator_17R4;
 import com.empcraft.biomes.generators.BiomeGenerator_18R1;
+import com.empcraft.biomes.generators.BiomeGenerator_18R2;
 
 public class BiomeHandler {
 private static BiomeGenerator generator = null;
     
-    public static boolean generate(final BiomeSelection selection, final Player player) {
+    public static boolean generate(final BiomeSelection selection, final Player player, Runnable whenDone) {
         if (generator == null) {
             return false;
         }
@@ -40,10 +41,10 @@ private static BiomeGenerator generator = null;
         }
         runner = name;
         isRunning = true;
-        return BiomeHandler.generator.generate(selection, player, sameProvider);
+        return BiomeHandler.generator.generate(selection, player, sameProvider, whenDone);
     }
     
-    public static void notifyPlayers() {
+    public static void notifyPlayers(Runnable whenDone) {
         runners.add(runner);
         for (final String name : runners) {
             final Player player = Bukkit.getPlayer(name);
@@ -55,17 +56,29 @@ private static BiomeGenerator generator = null;
         runner = "";
         isRunning = false;
         counter = 0;
+        if (whenDone != null) {
+            Bukkit.getScheduler().runTask(Main.plugin, whenDone);
+        }
     }
     
     public static void getNewGenerator(Biome biome, long seed) {
         try {
             BiomeHandler.generator = new BiomeGenerator_17R4(biome, seed);
+            return;
         }
         catch (Throwable e) { }
         try {
             BiomeHandler.generator = new BiomeGenerator_18R1(biome, seed);
+            return;
         }
-        catch (Throwable e) { }
+        catch (Throwable e) {}
+        try {
+            BiomeHandler.generator = new BiomeGenerator_18R2(biome, seed);
+            return;
+        }
+        catch (Throwable e) { 
+            e.printStackTrace();
+        }
     }
     
     public static long state = 157;

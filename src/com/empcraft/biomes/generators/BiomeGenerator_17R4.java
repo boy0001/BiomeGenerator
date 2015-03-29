@@ -2,7 +2,6 @@ package com.empcraft.biomes.generators;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
 
 import net.minecraft.server.v1_7_R4.BiomeBase;
@@ -72,7 +71,7 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
         return blocks;
     }
 
-    public boolean generate(final BiomeSelection selection, final Player player, final boolean sameProvider) {
+    public boolean generate(final BiomeSelection selection, final Player player, final boolean sameProvider, final Runnable whenDone) {
         final CraftWorld cw2 = (CraftWorld) selection.world;
         final World w2 = cw2.getHandle();
 
@@ -103,7 +102,7 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
                 final boolean result = chunk.load(false);
                 if (!result) {
                     Main.sendMessage(player, "&cPlease explore the selection fully.");
-                    BiomeHandler.notifyPlayers();
+                    BiomeHandler.notifyPlayers(whenDone);
                     return false;
                 }
                 length++;
@@ -203,11 +202,11 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
                     }
                     world.chunkProvider = currentChunkProvider;
                     BlockFalling.instaFall = true;
-                    BiomeHandler.notifyPlayers();
+                    BiomeHandler.notifyPlayers(whenDone);
                 } catch (final Throwable e) {
                     final Player player = Bukkit.getPlayer(BiomeHandler.runner);
                     Main.sendMessage(player, "&aBiome conversion was interrupted!");
-                    BiomeHandler.notifyPlayers();
+                    BiomeHandler.notifyPlayers(whenDone);
                 }
                 if (Main.canSetFast) {
                     SendChunk.sendChunk(cs);

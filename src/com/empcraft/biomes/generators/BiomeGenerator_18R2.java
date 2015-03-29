@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import net.minecraft.server.v1_8_R1.BiomeBase;
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.BlockFalling;
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.ChunkProviderGenerate;
-import net.minecraft.server.v1_8_R1.ChunkSnapshot;
-import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.WorldGenCanyon;
-import net.minecraft.server.v1_8_R1.WorldGenCaves;
+import net.minecraft.server.v1_8_R2.BiomeBase;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.BlockFalling;
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.ChunkProviderGenerate;
+import net.minecraft.server.v1_8_R2.ChunkSnapshot;
+import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R2.WorldGenCanyon;
+import net.minecraft.server.v1_8_R2.WorldGenCaves;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -32,13 +32,13 @@ import com.empcraft.biomes.SendChunk;
 /**
  * Created a random vanilla-style world using a specific biome.
  */
-public class BiomeGenerator_18R1 extends BiomeGenerator {
+public class BiomeGenerator_18R2 extends BiomeGenerator {
     private Biome biome;
     private BiomeBase   biomeBase;
 
     private final long  seed;
 
-    public BiomeGenerator_18R1(final Biome biome, final long seed) {
+    public BiomeGenerator_18R2(final Biome biome, final long seed) {
         this.biome = biome;
         this.seed = seed;
         try {
@@ -85,7 +85,6 @@ public class BiomeGenerator_18R1 extends BiomeGenerator {
         final World w2 = cw2.getHandle();
 
         final CraftWorld craftWorld;
-
         if (sameProvider) {
             craftWorld = cw2;
         }
@@ -142,10 +141,9 @@ public class BiomeGenerator_18R1 extends BiomeGenerator {
                 final int z = zv;
 
                 Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                    @SuppressWarnings("deprecation")
                     @Override
                     public void run() {
-                        ChunkSnapshot chunk = createChunk(generator, world, x >> 4, z >> 4, BiomeGenerator_18R1.this.biomeBase);
+                        ChunkSnapshot chunk = createChunk(generator, world, x >> 4, z >> 4, BiomeGenerator_18R2.this.biomeBase);
                         
                         long init_state = BiomeHandler.state;
                         
@@ -155,8 +153,8 @@ public class BiomeGenerator_18R1 extends BiomeGenerator {
                                 final int wz = z + cz;
 
                                 if ((wx >= selectionArray[0]) && (wz >= selectionArray[1]) && (wx <= selectionArray[2]) && (wz <= selectionArray[3])) {
-                                    craftWorld.setBiome(wx, wz, BiomeGenerator_18R1.this.biome);
-                                    if (BiomeGenerator_18R1.this.biome == Biome.MESA) {
+                                    craftWorld.setBiome(wx, wz, BiomeGenerator_18R2.this.biome);
+                                    if (BiomeGenerator_18R2.this.biome == Biome.MESA) {
                                         Random r = new Random();
                                         Integer[] ids = new Integer[] { 0, 1, 4, 7, 8, 12};
                                         for (int y = 0; y < 256; ++y) {
@@ -231,7 +229,7 @@ public class BiomeGenerator_18R1 extends BiomeGenerator {
                         for (int z = selectionArray[1] + Main.inset; z <= (selectionArray[3] - Main.inset); z += 16) {
                             try {
                                 BlockPosition pos = new BlockPosition((x >> 4) * 16, 0, (z >> 4) * 16);
-                                BiomeGenerator_18R1.this.biomeBase.a(w2, ReflectionUtils.getFieldValue(ChunkProviderGenerate.class, "h", Random.class, generator), pos);
+                                BiomeGenerator_18R2.this.biomeBase.a(w2, ReflectionUtils.getFieldValue(ChunkProviderGenerate.class, "h", Random.class, generator), pos);
                             }
                             catch (final NoSuchFieldException e) {
                                 e.printStackTrace();

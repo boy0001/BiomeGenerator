@@ -4,6 +4,6 @@ import org.bukkit.entity.Player;
 
 public abstract class BiomeGenerator {
 
-    public abstract boolean generate(BiomeSelection selection, Player player, boolean sameProvider);
+    public abstract boolean generate(BiomeSelection selection, Player player, boolean sameProvider, Runnable whenDone);
     
 }

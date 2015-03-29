@@ -119,7 +119,7 @@ public class PlotMeFeature implements Listener {
                 BiomeHandler.getNewGenerator(biome, new Random(System.nanoTime()).nextLong());
                 final int height = 64;
                 final BiomeSelection selection = new BiomeSelection(world, pos1, pos2, height);
-                BiomeHandler.generate(selection, player);
+                BiomeHandler.generate(selection, player, null);
 
                 event.setCancelled(true);
             }

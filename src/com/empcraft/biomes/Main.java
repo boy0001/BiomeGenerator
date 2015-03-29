@@ -20,7 +20,7 @@ public class Main extends JavaPlugin implements Listener {
     public static boolean                  canSetFast;
     public static int                      inset;
     public String                          version;
-    public Main                            plugin;
+    public static Main                     plugin;
     public static String                   world;
     public static FileConfiguration        config;
     public static HashMap<String, Integer> worldChanged = new HashMap<String, Integer>();

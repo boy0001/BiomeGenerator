@@ -35,11 +35,11 @@ public class WorldEditListener implements Listener {
         final String[] args = cmd.split(" ");
 
         if (cmd.startsWith("/biomegen") || cmd.startsWith("//biomegen") || cmd.startsWith("/worldedit:biomegen")) {
+            e.setCancelled(true);
             if (p.hasPermission("worldedit.biome.generate") || p.isOp()) {
                 if (args.length > 1) {
                     final String sb = args[1];
                     try {
-
                         int height = 64;
                         if (args.length > 2) {
                             try {
@@ -50,7 +50,6 @@ public class WorldEditListener implements Listener {
                                 return;
                             }
                         }
-
                         long seed;
                         if (args.length > 3) {
                             final World world = Bukkit.getWorld(args[3]);
@@ -115,7 +114,8 @@ public class WorldEditListener implements Listener {
 
                             final BiomeSelection s = new BiomeSelection(world, pos1, pos2, height);
                             BiomeHandler.getNewGenerator(biome, seed);
-                            BiomeHandler.generate(s, p);
+                            BiomeHandler.generate(s, p, null);
+                            Main.sendMessage(p, "&aGenerating biome, please wait...");
                         }
                         else {
                             Main.sendMessage(p, "&cThis command currently only supports cuboid selections");
@@ -128,13 +128,11 @@ public class WorldEditListener implements Listener {
                 }
                 else {
                     Main.sendMessage(p, "&cInvalid number of arguments:\n&6Use &7//biomegen <biome> [height]");
-                    e.setCancelled(true);
                 }
             }
             else {
                 Main.sendMessage(p, "&cYou do not have permission to execute this command.");
             }
-            e.setCancelled(true);
         }
     }
 }
