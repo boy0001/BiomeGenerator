@@ -7,35 +7,40 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
-import com.intellectualcrafters.plot.PlotSquared;
+import com.intellectualcrafters.plot.PS;
+import com.intellectualcrafters.plot.commands.CommandCategory;
+import com.intellectualcrafters.plot.commands.RequiredType;
 import com.intellectualcrafters.plot.commands.SubCommand;
 import com.intellectualcrafters.plot.config.C;
 import com.intellectualcrafters.plot.generator.HybridPlotWorld;
-import com.intellectualcrafters.plot.object.BukkitPlayer;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.object.PlotWorld;
-import com.intellectualcrafters.plot.object.RegionWrapper;
 import com.intellectualcrafters.plot.util.BlockManager;
 import com.intellectualcrafters.plot.util.MainUtil;
 import com.intellectualcrafters.plot.util.Permissions;
 import com.intellectualcrafters.plot.util.TaskManager;
-import com.intellectualcrafters.plot.util.bukkit.BukkitChunkManager;
-import com.intellectualcrafters.plot.util.bukkit.BukkitUtil;
+import com.plotsquared.bukkit.object.BukkitPlayer;
+import com.plotsquared.bukkit.util.BukkitUtil;
+import com.plotsquared.general.commands.CommandDeclaration;
 
+@CommandDeclaration(
+        command = "generatebiome",
+        permission = "plots.generatebiome",
+        category = CommandCategory.ACTIONS,
+        requiredType = RequiredType.NONE,
+        description = "Generate a biome in your plot",
+        aliases = {"bg","gb"},
+        usage = "/plots generatebiome <biome>"
+)
 public class GenerateBiomeCommand extends SubCommand {
 
-    public GenerateBiomeCommand() {
-        super("generatebiome", "plots.generatebiome", "Generate an authentic biome in your plot", "generatebiome", "gb", CommandCategory.ACTIONS, true);
-    }
-
     @Override
-    public boolean execute(final PlotPlayer pp, final String... args) {
+    public boolean onCommand(final PlotPlayer pp, final String... args) {
         if (args.length == 0) {
-            MainUtil.sendMessage(pp, "&7Use: &c/plot generatebiome <biome>");
+            MainUtil.sendMessage(pp, C.COMMAND_SYNTAX, "/plot generatebiome <biome>");
             return false;
         }
         Location loc = pp.getLocation();
@@ -52,7 +57,8 @@ public class GenerateBiomeCommand extends SubCommand {
         Biome biome = null;
 
         if (args[0].equalsIgnoreCase("auto")) {
-            biome = Biome.valueOf(BlockManager.manager.getBiome(MainUtil.getPlotBottomLoc(loc.getWorld(), plot.id).add(1, 0, 1)));
+            Location bot = MainUtil.getPlotBottomLoc(loc.getWorld(), plot.id).add(1, 0, 1);
+            biome = Biome.valueOf(BlockManager.manager.getBiome(loc.getWorld(), bot.getX(), bot.getZ()));
         }
         else {
             try {
@@ -76,7 +82,7 @@ public class GenerateBiomeCommand extends SubCommand {
         
         if (BiomeHandler.isRunning) {
             String name = pp.getName();
-            MainUtil.sendMessage(pp, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
+            MainUtil.sendMessage(pp, BBC.IN_PROGRESS.s);
             if (BiomeHandler.runner.equals(name) && !BiomeHandler.runners.contains(name)) {
                 BiomeHandler.runners.add(name);
             }
@@ -86,7 +92,7 @@ public class GenerateBiomeCommand extends SubCommand {
         BiomeHandler.getNewGenerator(biome, new Random(System.nanoTime()).nextLong());
 
         int height = 64;
-        final PlotWorld plotworld = PlotSquared.getPlotWorld(plot.world);
+        final PlotWorld plotworld = PS.get().getPlotWorld(plot.world);
         if (plotworld instanceof HybridPlotWorld) {
             height = ((HybridPlotWorld) plotworld).PLOT_HEIGHT;
         }

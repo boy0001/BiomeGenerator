@@ -1,5 +1,7 @@
 package com.empcraft.biomes;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +28,33 @@ public class Main extends JavaPlugin implements Listener {
     public static FileConfiguration        config;
     public static HashMap<String, Integer> worldChanged = new HashMap<String, Integer>();
     public static int                      interval;
+    
+    public static File messageFile;
+    public static YamlConfiguration messageConfig;
 
+    @Override
+    public void onEnable() {
+        this.version = getDescription().getVersion();
+        Main.plugin = this;
+        setupPlotSquared();
+        setupPlotMe();
+        setupWorldEdit();
+        setupConfig();
+        Main.config = this.getConfig();
+        setupMessages();
+
+        try {
+            new SetBlockFast();
+            new SendChunk_();
+            Main.canSetFast = true;
+        }
+        catch (final Exception e) {
+            Main.canSetFast = false;
+        }
+        
+        Bukkit.getServer().getPluginManager().registerEvents(this, this);
+    }
+    
     private static String colorise(final String mystring) {
         return ChatColor.translateAlternateColorCodes('&', mystring);
     }
@@ -71,27 +100,33 @@ public class Main extends JavaPlugin implements Listener {
         }
         return false;
     }
-
-    @Override
-    public void onEnable() {
-        this.version = getDescription().getVersion();
-        this.plugin = this;
-        setupPlotSquared();
-        setupPlotMe();
-        setupWorldEdit();
-        setupConfig();
-        Main.config = this.getConfig();
-
+    
+    public void setupMessages() {
+        if (Main.messageFile == null) {
+            messageFile = new File(this.getDataFolder() + File.separator + "messages.yml");
+        }
+        if (!messageFile.exists()) {
+            try {
+                messageFile.createNewFile();
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }
+        messageConfig = YamlConfiguration.loadConfiguration(messageFile);
+        for (final BBC bbc : BBC.values()) {
+            final String name = bbc.name();
+            final String value = bbc.s;
+            if (!messageConfig.contains(name)) {
+                messageConfig.set(name, ChatColor.translateAlternateColorCodes('&', value.replaceAll("\n", "\\n")));
+            } else {
+                bbc.s = ChatColor.translateAlternateColorCodes('&', messageConfig.getString(name).replaceAll("\\n", "\n"));
+            }
+        }
         try {
-            new SetBlockFast();
-            new SendChunk();
-            Main.canSetFast = true;
+            messageConfig.save(messageFile);
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
-        catch (final Exception e) {
-            Main.canSetFast = false;
-        }
-        
-        Bukkit.getServer().getPluginManager().registerEvents(this, this);
     }
 
     private void setupConfig() {

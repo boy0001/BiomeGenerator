@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import com.empcraft.biomes.generators.BiomeGenerator_17R4;
 import com.empcraft.biomes.generators.BiomeGenerator_18R1;
 import com.empcraft.biomes.generators.BiomeGenerator_18R2;
+import com.empcraft.biomes.generators.BiomeGenerator_18R3;
 
 public class BiomeHandler {
 private static BiomeGenerator generator = null;
@@ -25,7 +26,7 @@ private static BiomeGenerator generator = null;
         }
 
         if (isRunning) {
-            Main.sendMessage(player, "&cSome user is already executing a biome conversion. We will remind you when this finishes");
+            Main.sendMessage(player, BBC.IN_PROGRESS.s);
             if (runner.equals(name) && !runners.contains(name)) {
                 runners.add(name);
             }
@@ -49,7 +50,7 @@ private static BiomeGenerator generator = null;
         for (final String name : runners) {
             final Player player = Bukkit.getPlayer(name);
             if (player != null) {
-                Main.sendMessage(player, "&6The biome conversion by &a" + runner + " &6has finished!");
+                BBC.sendMessage(player, BBC.FINISHED_NOTIFY, runner);
             }
         }
         runners = new HashSet<String>();
@@ -74,6 +75,13 @@ private static BiomeGenerator generator = null;
         catch (Throwable e) {}
         try {
             BiomeHandler.generator = new BiomeGenerator_18R2(biome, seed);
+            return;
+        }
+        catch (Throwable e) {}
+        try {
+            BiomeHandler.generator = new BiomeGenerator_18R3(biome, seed);
+            new SetBlockFast_1_8();
+            new SendChunk();
             return;
         }
         catch (Throwable e) { 

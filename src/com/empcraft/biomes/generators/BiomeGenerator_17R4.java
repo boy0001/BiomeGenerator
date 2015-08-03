@@ -22,12 +22,13 @@ import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.empcraft.biomes.BBC;
 import com.empcraft.biomes.BiomeGenerator;
 import com.empcraft.biomes.BiomeHandler;
 import com.empcraft.biomes.BiomeSelection;
 import com.empcraft.biomes.Main;
 import com.empcraft.biomes.ReflectionUtils;
-import com.empcraft.biomes.SendChunk;
+import com.empcraft.biomes.SendChunk_;
 
 /**
  * Created a random vanilla-style world using a specific biome.
@@ -101,7 +102,7 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
                 cs.add(chunk);
                 final boolean result = chunk.load(false);
                 if (!result) {
-                    Main.sendMessage(player, "&cPlease explore the selection fully.");
+                    Main.sendMessage(player, BBC.UNEXPLORED.s);
                     BiomeHandler.notifyPlayers(whenDone);
                     return false;
                 }
@@ -109,7 +110,7 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
             }
         }
 
-        Main.sendMessage(player, "&6Estimated time: &a" + (Main.interval * length / 10) + " seconds");
+        BBC.sendMessage(player, BBC.ESTIMATE, ((Main.interval * length) / 10));
 
         final int worldHeight = craftWorld.getMaxHeight();
         final int seaHeight = craftWorld.getSeaLevel();
@@ -182,7 +183,6 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
 
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 
-            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 try {
@@ -205,11 +205,13 @@ public class BiomeGenerator_17R4 extends BiomeGenerator {
                     BiomeHandler.notifyPlayers(whenDone);
                 } catch (final Throwable e) {
                     final Player player = Bukkit.getPlayer(BiomeHandler.runner);
-                    Main.sendMessage(player, "&aBiome conversion was interrupted!");
+                    if (player != null) {
+                        Main.sendMessage(player, BBC.INTERRUPTED.s);
+                    }
                     BiomeHandler.notifyPlayers(whenDone);
                 }
                 if (Main.canSetFast) {
-                    SendChunk.sendChunk(cs);
+                    SendChunk_.sendChunk(cs);
                 }
             }
         }, Main.interval * BiomeHandler.counter + 20);
