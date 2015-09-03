@@ -122,7 +122,7 @@ public class GenerateBiomeCommand extends SubCommand {
                 Byte[][][] data = new Byte[16][16][128];
                 for (int i = 0; i < 16; i++) {
                     for (int j = 0; j < 16; j++) {
-                        for (int y = 0; y < 128; y++) {
+                        for (int y = 0; y < 164; y++) {
                             int X = (x << 4) + i;
                             int Z = (z << 4) + j;
                             if (X >= bxo && X <= exo && Z >= bzo && Z <= ezo) {
@@ -156,7 +156,7 @@ public class GenerateBiomeCommand extends SubCommand {
                                 Byte[][][] data = datas.get(chunk);
                                 for (int i = 0; i < 16; i++) {
                                     for (int j = 0; j < 16; j++) {
-                                        for (int y = 0; y < 128; y++) {
+                                        for (int y = 0; y < 164; y++) {
                                             Short cid = id[i][j][y];
                                             Byte cdata = data[i][j][y];
                                             if (cid == null) {

@@ -1,7 +1,8 @@
 package com.empcraft.biomes.generators;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
@@ -13,20 +14,20 @@ import com.empcraft.biomes.SetBlockFast_1_8;
 import com.empcraft.biomes.TaskManager;
 
 public class SetBlockQueue {
-    
+
     private volatile static HashMap<ChunkWrapper, BlockWrapper[][]> blocks;
     private volatile static int allocate = 25;
     private volatile static boolean running = false;
     private volatile static boolean locked = false;
-    private volatile static HashSet<Runnable> runnables;
+    private volatile static ArrayDeque<Runnable> runnables;
     private static long last;
     private static int lastInt = 0;
     private static BlockWrapper lastBlock = new BlockWrapper((short) 0, (byte) 0);
-    
+
     private static short[][] x_loc;
     private static short[][] y_loc;
     private static short[][] z_loc;
-    
+
     public static void initCache() {
         if (x_loc == null) {
             x_loc = new short[16][4096];
@@ -46,31 +47,53 @@ public class SetBlockQueue {
             }
         }
     }
-    
+
     public synchronized static void allocate(final int t) {
         allocate = t;
     }
-    
+
     public static int getAllocate() {
         return allocate;
     }
-    
-    public synchronized static void addNotify(final Runnable whenDone) {
+
+    public synchronized static boolean addNotify(final Runnable whenDone) {
         if (runnables == null) {
-            TaskManager.task(whenDone);
-            locked = false;
-        } else {
+            if ((blocks == null) || (blocks.size() == 0)) {
+                if (whenDone != null) {
+                    whenDone.run();
+                }
+                locked = false;
+                return true;
+            }
+            runnables = new ArrayDeque<>();
+        }
+        if (whenDone != null) {
+            init();
             runnables.add(whenDone);
         }
+        if ((blocks == null) || (blocks.size() == 0) || !blocks.entrySet().iterator().hasNext()) {
+            final ArrayDeque<Runnable> tasks = runnables;
+            lastInt = -1;
+            lastBlock = null;
+            runnables = null;
+            running = false;
+            blocks = null;
+            if (tasks != null) {
+                for (final Runnable runnable : tasks) {
+                    runnable.run();
+                }
+            }
+        }
+        return false;
     }
-    
+
     public synchronized static void init() {
         if (blocks == null) {
             if (x_loc == null) {
                 initCache();
             }
             blocks = new HashMap<>();
-            runnables = new HashSet<>();
+            runnables = new ArrayDeque<>();
         }
         if (!running) {
             TaskManager.index.increment();
@@ -81,23 +104,44 @@ public class SetBlockQueue {
                     if (locked) {
                         return;
                     }
-                    if (blocks.size() == 0) {
+                    if ((blocks == null) || (blocks.size() == 0)) {
                         Bukkit.getScheduler().cancelTask(TaskManager.tasks.get(current));
-                        for (final Runnable runnable : runnables) {
-                            TaskManager.task(runnable);
-                        }
+                        final ArrayDeque<Runnable> tasks = runnables;
+                        lastInt = -1;
+                        lastBlock = null;
                         runnables = null;
-                        blocks = null;
                         running = false;
+                        blocks = null;
+                        if (tasks != null) {
+                            for (final Runnable runnable : tasks) {
+                                runnable.run();
+                            }
+                        }
                         return;
                     }
                     final long newLast = System.currentTimeMillis();
-                    last = Math.max(newLast - 100, last);
-                    while ((blocks.size() > 0) && ((System.currentTimeMillis() - last) < (100 + allocate))) {
+                    last = Math.max(newLast - 50, last);
+                    while ((blocks.size() > 0) && ((System.currentTimeMillis() - last) < (50 + allocate))) {
                         if (locked) {
                             return;
                         }
-                        final Entry<ChunkWrapper, BlockWrapper[][]> n = blocks.entrySet().iterator().next();
+                        final Iterator<Entry<ChunkWrapper, BlockWrapper[][]>> iter = blocks.entrySet().iterator();
+                        if (!iter.hasNext()) {
+                            Bukkit.getScheduler().cancelTask(TaskManager.tasks.get(current));
+                            final ArrayDeque<Runnable> tasks = runnables;
+                            lastInt = -1;
+                            lastBlock = null;
+                            runnables = null;
+                            running = false;
+                            blocks = null;
+                            if (tasks != null) {
+                                for (final Runnable runnable : tasks) {
+                                    runnable.run();
+                                }
+                            }
+                            return;
+                        }
+                        final Entry<ChunkWrapper, BlockWrapper[][]> n = iter.next();
                         final ChunkWrapper chunk = n.getKey();
                         final BlockWrapper[][] blocks = n.getValue();
                         final int X = chunk.x << 4;
@@ -120,12 +164,12 @@ public class SetBlockQueue {
                         }
                     }
                 }
-            }, 2);
+            }, 1);
             TaskManager.tasks.put(current, task);
             running = true;
         }
     }
-    
+
     public static void setChunk(final String world, final ChunkLoc loc, final BlockWrapper[][] result) {
         locked = true;
         if (!running) {
@@ -135,95 +179,106 @@ public class SetBlockQueue {
         blocks.put(wrap, result);
         locked = false;
     }
-    
+
     public static void setBlock(final String world, int x, final int y, int z, final BlockWrapper block) {
         locked = true;
         if (!running) {
             init();
         }
         final int X = x >> 4;
-        final int Z = z >> 4;
-        x -= X << 4;
-        z -= Z << 4;
-        
-        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
-        BlockWrapper[][] result;
-        result = blocks.get(wrap);
-        if (!blocks.containsKey(wrap)) {
-            result = new BlockWrapper[16][];
-            blocks.put(wrap, result);
-        }
-        
-        if (result[y >> 4] == null) {
-            result[y >> 4] = new BlockWrapper[4096];
-        }
-        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = block;
-        locked = false;
+                                final int Z = z >> 4;
+                        x -= X << 4;
+                        z -= Z << 4;
+
+                        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
+                        BlockWrapper[][] result;
+                        result = blocks.get(wrap);
+                        if (!blocks.containsKey(wrap)) {
+                            result = new BlockWrapper[16][];
+                            blocks.put(wrap, result);
+                        }
+                        if ((y > 255) || (y < 0)) {
+                            locked = false;
+                            return;
+                        }
+                        if (result[y >> 4] == null) {
+                            result[y >> 4] = new BlockWrapper[4096];
+                        }
+                        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = block;
+                        locked = false;
     }
-    
+
     public static void setData(final String world, int x, final int y, int z, final byte data) {
         locked = true;
         if (!running) {
             init();
         }
         final int X = x >> 4;
-        final int Z = z >> 4;
-        x -= X << 4;
-        z -= Z << 4;
-        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
-        BlockWrapper[][] result;
-        result = blocks.get(wrap);
-        if (!blocks.containsKey(wrap)) {
-            result = new BlockWrapper[16][];
-            blocks.put(wrap, result);
-        }
-        if (result[y >> 4] == null) {
-            result[y >> 4] = new BlockWrapper[4096];
-        }
-        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = new BlockWrapper((short) -1, data);
-        locked = false;
+                        final int Z = z >> 4;
+                        x -= X << 4;
+                        z -= Z << 4;
+                        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
+                        BlockWrapper[][] result;
+                        result = blocks.get(wrap);
+                        if (!blocks.containsKey(wrap)) {
+                            result = new BlockWrapper[16][];
+                            blocks.put(wrap, result);
+                        }
+                        if ((y > 255) || (y < 0)) {
+                            locked = false;
+                            return;
+                        }
+                        if (result[y >> 4] == null) {
+                            result[y >> 4] = new BlockWrapper[4096];
+                        }
+                        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = new BlockWrapper((short) -1, data);
+                        locked = false;
     }
-    
+
     public static void setBlock(final String world, int x, final int y, int z, final int id) {
         locked = true;
         if (!running) {
             init();
         }
         final int X = x >> 4;
-        final int Z = z >> 4;
-        x -= X << 4;
-        z -= Z << 4;
-        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
-        BlockWrapper[][] result;
-        result = blocks.get(wrap);
-        if (!blocks.containsKey(wrap)) {
-            result = new BlockWrapper[16][];
-            blocks.put(wrap, result);
-        }
-        if (result[y >> 4] == null) {
-            result[y >> 4] = new BlockWrapper[4096];
-        }
-        if (id == lastInt) {
-            result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = lastBlock;
-        } else {
-            lastInt = id;
-            lastBlock = new BlockWrapper((short) id, (byte) 0);
-        }
-        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = lastBlock;
-        locked = false;
+                        final int Z = z >> 4;
+                        x -= X << 4;
+                        z -= Z << 4;
+                        final ChunkWrapper wrap = new ChunkWrapper(world, X, Z);
+                        BlockWrapper[][] result;
+                        result = blocks.get(wrap);
+                        if (!blocks.containsKey(wrap)) {
+                            result = new BlockWrapper[16][];
+                            blocks.put(wrap, result);
+                        }
+                        if ((y > 255) || (y < 0)) {
+                            locked = false;
+                            return;
+                        }
+                        if (result[y >> 4] == null) {
+                            result[y >> 4] = new BlockWrapper[4096];
+                        }
+                        if (id == lastInt) {
+                            result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = lastBlock;
+                        } else {
+                            lastInt = id;
+                            lastBlock = new BlockWrapper((short) id, (byte) 0);
+                        }
+                        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = lastBlock;
+                        locked = false;
     }
-    
+
     public static class ChunkWrapper {
         public final int x;
         public final int z;
         public final String world;
-        
+
         public ChunkWrapper(final String world, final int x, final int z) {
             this.world = world;
             this.x = x;
             this.z = z;
         }
-        
+
         @Override
         public int hashCode() {
             int result;
@@ -246,7 +301,7 @@ public class SetBlockQueue {
             result = (result * 31) + this.world.hashCode();
             return result;
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (this == obj) {

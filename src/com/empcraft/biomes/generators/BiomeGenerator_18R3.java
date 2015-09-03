@@ -122,6 +122,7 @@ public class BiomeGenerator_18R3 extends BiomeGenerator {
         final int z2 = pos2.getBlockZ();
 
         final int[] selectionArray = new int[] { x1, z1, x2, z2 };
+        final int[] selectionArray2 = new int[] { x1 + Main.inset , z1 + Main.inset, x2 - Main.inset, z2 - Main.inset };
 
         BiomeHandler.counter = 1;
         final ArrayList<Chunk> finished = new ArrayList<Chunk>();
@@ -157,7 +158,7 @@ public class BiomeGenerator_18R3 extends BiomeGenerator {
                 break;
         }
         
-        BBC.sendMessage(player, BBC.ESTIMATE, ((Main.interval * toGen.size()) / 10));
+        BBC.sendMessage(player, BBC.ESTIMATE, 1 + ((Main.interval * toGen.size()) / 10));
         
         TaskManager.task(new Runnable() {
             @Override
@@ -180,10 +181,16 @@ public class BiomeGenerator_18R3 extends BiomeGenerator {
                                         if (chunk.load(false)) {
                                             int x = chunk.getX();
                                             int z = chunk.getZ();
-                                            generator.getChunkAt(generator, x, z);
-                                            BlockPosition pos = new BlockPosition((x >> 4) * 16, 0, (z >> 4) * 16);
-                                            Random r = ReflectionUtils.getFieldValue(ChunkProviderGenerate.class, "h", Random.class, generator);
-                                            BiomeGenerator_18R3.this.biomeBase.a(w2, r, pos);
+                                            int xx = x << 4;
+                                            int zz = z << 4;
+                                            int xx2 = xx + 31;
+                                            int zz2 = zz + 31;
+                                            if (xx2 >= selectionArray2[0] && zz2 >= selectionArray2[1] && xx <= selectionArray2[2] && zz <= selectionArray2[3]) {
+                                                generator.getChunkAt(generator, x, z);
+                                                BlockPosition pos = new BlockPosition((x >> 4) * 16, 0, (z >> 4) * 16);
+                                                Random r = ReflectionUtils.getFieldValue(ChunkProviderGenerate.class, "h", Random.class, generator);
+                                                BiomeGenerator_18R3.this.biomeBase.a(w2, r, pos);
+                                            }
                                         }
                                     }
                                     catch (final Throwable e) {
